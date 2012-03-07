@@ -60,7 +60,7 @@ object EnsimeCommand {
 
       val initX = Project extract state
 
-      val projs = initX.structure.allProjects.map{
+      val projs:List[Map[KeywordAtom,SExp]] = initX.structure.allProjects.map{
 	proj =>
 
 	import Compat._
@@ -110,16 +110,52 @@ object EnsimeCommand {
 	val extras = optSetting(ensimeConfig).getOrElse(SExpList(List[SExp]()))
 	logger(s).info(" User configuration = " + extras.toReadableString)
 
-	extras.toKeywordMap ++ Map[KeywordAtom,SExp](
-	  key(":name") -> name.map(SExp.apply).getOrElse(NilAtom()),
-	  key(":package") -> org.map(SExp.apply).getOrElse(NilAtom()),
-	  key(":version") -> projectVersion.map(SExp.apply).getOrElse(NilAtom()),
-	  key(":compile-deps") -> SExp(compileDeps.map(SExp.apply)),
-	  key(":runtime-deps") -> SExp(runtimeDeps.map(SExp.apply)),
-	  key(":test-deps") -> SExp(testDeps.map(SExp.apply)),
-	  key(":source-roots") -> SExp(sourceRoots.map(SExp.apply)),
-	  key(":target") -> target.map(SExp.apply).getOrElse(NilAtom()))
-      }
+
+	def merge(user:Option[SExp], sbt:Option[SExp]):SExp = {
+	  (user, sbt) match{
+	    case (Some(s1:SExp),None) => s1
+	    case (None,Some(s2:SExp)) => s2
+	    case (Some(SExpList(items1)), Some(SExpList(items2))) => SExpList(items1 ++ items2)
+	    case (Some(s1:SExp),Some(s2:SExp)) => s2
+	    case _ => NilAtom()
+	  }
+	}
+
+	val xtras = extras.toKeywordMap
+	Map[KeywordAtom,SExp](
+
+	  key(":name") -> merge(
+	    xtras.get(key(":name")), 
+	    name.map(SExp.apply)),
+
+	  key(":package") -> merge(
+	    xtras.get(key(":package")), 
+	    org.map(SExp.apply)),
+
+	  key(":version") -> merge(
+	    xtras.get(key(":version")), 
+	    projectVersion.map(SExp.apply)),
+
+	  key(":compile-deps") -> merge(
+	    xtras.get(key(":compile-deps")), 
+	    Some(SExp(compileDeps.map(SExp.apply)))),
+
+	  key(":runtime-deps") -> merge(
+	    xtras.get(key(":runtime-deps")), 
+	    Some(SExp(runtimeDeps.map(SExp.apply)))),
+
+	  key(":test-deps") -> merge(
+	    xtras.get(key(":test-deps")), 
+	    Some(SExp(testDeps.map(SExp.apply)))),
+
+	  key(":source-roots") -> merge(
+	    xtras.get(key(":source-roots")), 
+	    Some(SExp(sourceRoots.map(SExp.apply)))),
+
+	  key(":target") -> merge(
+	    xtras.get(key(":target")), 
+	    target.map(SExp.apply)))
+      }.toList
 
       val result = SExp(Map(
 	  key(":subprojects") -> SExp(projs.map{p => SExp(p)})
@@ -136,3 +172,4 @@ object EnsimeCommand {
     }
   }
 }
+

@@ -10,7 +10,7 @@ __For use with ensime 0.9.0+__
 
 
 ## How to Install
-Add the following to your `~/.sbt/plugins/build.sbt`:
+Add the following to your `~/.sbt/plugins.sbt`:
 
     resolvers += "Scala-Tools Maven2 Snapshots Repository" at "http://scala-tools.org/repo-snapshots"
 
