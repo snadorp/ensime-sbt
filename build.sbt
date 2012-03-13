@@ -6,9 +6,7 @@ organization := "org.ensime"
 
 version := "0.0.8"
 
-libraryDependencies += "net.liftweb" %% "lift-json" % "2.4-M4"
-
-crossScalaVersions := Seq("2.9.0", "2.9.1")
+crossScalaVersions := Seq("2.9.1")
 
 scalacOptions := Seq("-deprecation", "-unchecked")
 

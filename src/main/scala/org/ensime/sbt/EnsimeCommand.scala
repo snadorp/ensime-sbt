@@ -35,9 +35,6 @@ object EnsimeCommand {
   import sbt._
   import Keys._
   import CommandSupport.logger
-  import net.liftweb.json.JsonAST
-  import net.liftweb.json.Printer._
-  import net.liftweb.json.JsonDSL._
 
   val ensimeCommand = "ensime"
   val ensimeBrief = (ensimeCommand + " dump <project> <outputFile>", 
@@ -75,7 +72,6 @@ object EnsimeCommand {
 	implicit val x = Extracted(initX.structure, initX.session, projRef)
 	implicit val buildStruct = x.structure
 	val session = x.session
-
 
 	val name = optSetting(Keys.name)
 	val org = optSetting(organization)
