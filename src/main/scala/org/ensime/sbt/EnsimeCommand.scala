@@ -81,6 +81,8 @@ object EnsimeCommand {
 	val org = optSetting(organization)
 	val projectVersion = optSetting(version)
 	val buildScalaVersion = optSetting(scalaVersion)
+	val modName = optSetting(moduleName)
+	val modDeps = evaluateTask(projectDependencies).getOrElse(List()).map(_.name)
 	
 	val compileDeps = (
        	  taskFiles(unmanagedClasspath in Compile) ++ 
@@ -127,6 +129,10 @@ object EnsimeCommand {
 	  key(":name") -> merge(
 	    xtras.get(key(":name")), 
 	    name.map(SExp.apply)),
+
+	  key(":module-name") -> modName.map(SExp.apply).getOrElse(NilAtom()),
+
+	  key(":depends-on-modules") -> SExpList(modDeps.map(SExp.apply)),
 
 	  key(":package") -> merge(
 	    xtras.get(key(":package")), 
