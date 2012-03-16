@@ -41,6 +41,23 @@ object EnsimeCommand {
     "Dump project for <project> information to <outputFile>.")
   val ensimeDetailed = ""
 
+  type KeyMap = Map[KeywordAtom, SExp]
+
+  private def simpleMerge(m1:KeyMap, m2:KeyMap):KeyMap = {
+    val keys = Set() ++ m1.keys ++ m2.keys
+    val merged: Map[KeywordAtom, SExp] = keys.map{ key =>
+      (m1.get(key), m2.get(key)) match{
+	case (Some(s1),None) => (key, s1)
+	case (None,Some(s2)) => (key, s2)
+	case (Some(SExpList(items1)), 
+	  Some(SExpList(items2))) => (key, SExpList(items1 ++ items2))
+	case (Some(s1:SExp),Some(s2:SExp)) => (key, s2)
+	case _ => (key, NilAtom())
+      }
+    }.toMap
+    merged 
+  }
+
   def ensime = Command.args(ensimeCommand, ensimeBrief, ensimeDetailed, "huh?"){
     case (state,"generate"::rest) =>  {
 
@@ -57,7 +74,7 @@ object EnsimeCommand {
 
       val initX = Project extract state
 
-      val projs:List[Map[KeywordAtom,SExp]] = initX.structure.allProjects.map{
+      val projs:List[KeyMap] = initX.structure.allProjects.map{
 	proj =>
 
 	import Compat._
@@ -105,58 +122,22 @@ object EnsimeCommand {
 
 	val target = optSetting(classDirectory in Compile).map(_.getCanonicalPath)
 
-	val extras = optSetting(ensimeConfig).getOrElse(SExpList(List[SExp]()))
-	logger(s).info(" User configuration = " + extras.toReadableString)
+	val userDefined = optSetting(ensimeConfig).
+	getOrElse(SExpList(List[SExp]())).toKeywordMap
 
-
-	def merge(user:Option[SExp], sbt:Option[SExp]):SExp = {
-	  (user, sbt) match{
-	    case (Some(s1:SExp),None) => s1
-	    case (None,Some(s2:SExp)) => s2
-	    case (Some(SExpList(items1)), Some(SExpList(items2))) => SExpList(items1 ++ items2)
-	    case (Some(s1:SExp),Some(s2:SExp)) => s2
-	    case _ => NilAtom()
-	  }
-	}
-
-	val xtras = extras.toKeywordMap
-	Map[KeywordAtom,SExp](
-
-	  key(":name") -> merge(
-	    xtras.get(key(":name")), 
-	    name.map(SExp.apply)),
-
+	val thisModule = Map[KeywordAtom,SExp](
+	  key(":name") -> name.map(SExp.apply).getOrElse(NilAtom()),
 	  key(":module-name") -> modName.map(SExp.apply).getOrElse(NilAtom()),
-
 	  key(":depends-on-modules") -> SExpList(modDeps.map(SExp.apply)),
+	  key(":package") -> org.map(SExp.apply).getOrElse(NilAtom()),
+	  key(":version") -> projectVersion.map(SExp.apply).getOrElse(NilAtom()),
+	  key(":compile-deps") -> SExp(compileDeps.map(SExp.apply)),
+	  key(":runtime-deps") -> SExp(runtimeDeps.map(SExp.apply)),
+	  key(":test-deps") -> SExp(testDeps.map(SExp.apply)),
+	  key(":source-roots") -> SExp(sourceRoots.map(SExp.apply)),
+	  key(":target") -> target.map(SExp.apply).getOrElse(NilAtom()))
 
-	  key(":package") -> merge(
-	    xtras.get(key(":package")), 
-	    org.map(SExp.apply)),
-
-	  key(":version") -> merge(
-	    xtras.get(key(":version")), 
-	    projectVersion.map(SExp.apply)),
-
-	  key(":compile-deps") -> merge(
-	    xtras.get(key(":compile-deps")), 
-	    Some(SExp(compileDeps.map(SExp.apply)))),
-
-	  key(":runtime-deps") -> merge(
-	    xtras.get(key(":runtime-deps")), 
-	    Some(SExp(runtimeDeps.map(SExp.apply)))),
-
-	  key(":test-deps") -> merge(
-	    xtras.get(key(":test-deps")), 
-	    Some(SExp(testDeps.map(SExp.apply)))),
-
-	  key(":source-roots") -> merge(
-	    xtras.get(key(":source-roots")), 
-	    Some(SExp(sourceRoots.map(SExp.apply)))),
-
-	  key(":target") -> merge(
-	    xtras.get(key(":target")), 
-	    target.map(SExp.apply)))
+	simpleMerge(userDefined, thisModule)
       }.toList
 
       val result = SExp(Map(
