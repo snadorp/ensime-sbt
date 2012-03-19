@@ -6,13 +6,11 @@ An sbt plugin that supports integration with the ENSIME IDE.
 
 __For use with ensime 0.9.0+__
 
-0.0.9
+0.0.10
 
 
 ## How to Install
-Add the following to your `~/.sbt/plugins.sbt`:
-
-    resolvers += "Scala-Tools Maven2 Snapshots Repository" at "http://scala-tools.org/repo-snapshots"
+Add the following to your `~/.sbt/plugins/plugins.sbt` or ~/project/plugins.sbt:
 
     addSbtPlugin("org.ensime" % "ensime-sbt-cmd" % "VERSION")
 
