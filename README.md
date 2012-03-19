@@ -10,7 +10,7 @@ __For use with ensime 0.9.0+__
 
 
 ## How to Install
-Add the following to your `~/.sbt/plugins/plugins.sbt` or ~/project/plugins.sbt:
+Add the following to your `~/.sbt/plugins/plugins.sbt` or YOUR_PROJECT/project/plugins.sbt:
 
     addSbtPlugin("org.ensime" % "ensime-sbt-cmd" % "VERSION")
 
