@@ -103,11 +103,7 @@ object EnsimeCommand {
 	  optSetting(moduleName)
 	}
 	val modDeps = {
-
-	  // Dependencies include direct, declared dependencies:
 	  evaluateTask(projectDependencies).getOrElse(List()).map(_.name) ++
-	  
-	  // And subprojects of an aggregate:
 	  proj.aggregate.flatMap(projectRefModuleName)
 	}
 	
