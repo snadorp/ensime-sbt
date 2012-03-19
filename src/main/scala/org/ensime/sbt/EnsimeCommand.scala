@@ -74,6 +74,7 @@ object EnsimeCommand {
 
       val initX = Project extract state
 
+
       val projs:List[KeyMap] = initX.structure.allProjects.map{
 	proj =>
 
@@ -95,7 +96,20 @@ object EnsimeCommand {
 	val projectVersion = optSetting(version)
 	val buildScalaVersion = optSetting(scalaVersion)
 	val modName = optSetting(moduleName)
-	val modDeps = evaluateTask(projectDependencies).getOrElse(List()).map(_.name)
+
+	def projectRefModuleName(ref:ProjectRef):Option[String] = {
+	  implicit val x = Extracted(initX.structure, initX.session, ref)
+	  implicit val buildStruct = x.structure
+	  optSetting(moduleName)
+	}
+	val modDeps = {
+
+	  // Dependencies include direct, declared dependencies:
+	  evaluateTask(projectDependencies).getOrElse(List()).map(_.name) ++
+	  
+	  // And subprojects of an aggregate:
+	  proj.aggregate.flatMap(projectRefModuleName)
+	}
 	
 	val compileDeps = (
        	  taskFiles(unmanagedClasspath in Compile) ++ 
@@ -155,4 +169,3 @@ object EnsimeCommand {
     }
   }
 }
-
