@@ -17,5 +17,7 @@ Add the following to your `~/.sbt/plugins/plugins.sbt` or YOUR_PROJECT/project/p
 ## How to Use
 The above automatically adds the `ensime generate` command to your sbt build. This command will write a .ensime file to your project's root directory.
 
+Note: Currently, it may be necessary to first delete your project/target directories before running 'ensime generate'.
+
 ## License
 BSD License
