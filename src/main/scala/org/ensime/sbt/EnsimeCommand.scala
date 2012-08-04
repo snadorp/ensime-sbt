@@ -1,7 +1,7 @@
 /**
 *  Copyright (c) 2010, Aemon Cannon
 *  All rights reserved.
-*  
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions are met:
 *      * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
 *      * Neither the name of ENSIME nor the
 *        names of its contributors may be used to endorse or promote products
 *        derived from this software without specific prior written permission.
-*  
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -37,7 +37,7 @@ object EnsimeCommand {
   import CommandSupport.logger
 
   val ensimeCommand = "ensime"
-  val ensimeBrief = (ensimeCommand + " dump <project> <outputFile>", 
+  val ensimeBrief = (ensimeCommand + " dump <project> <outputFile>",
     "Dump project for <project> information to <outputFile>.")
   val ensimeDetailed = ""
 
@@ -49,13 +49,13 @@ object EnsimeCommand {
       (m1.get(key), m2.get(key)) match{
 	case (Some(s1),None) => (key, s1)
 	case (None,Some(s2)) => (key, s2)
-	case (Some(SExpList(items1)), 
+	case (Some(SExpList(items1)),
 	  Some(SExpList(items2))) => (key, SExpList(items1 ++ items2))
 	case (Some(s1:SExp),Some(s2:SExp)) => (key, s2)
 	case _ => (key, NilAtom())
       }
     }.toMap
-    merged 
+    merged
   }
 
   def ensime = Command.args(ensimeCommand, ensimeBrief, ensimeDetailed, "huh?"){
@@ -70,7 +70,7 @@ object EnsimeCommand {
 	throw new IllegalArgumentException()
       }
 
-      logInfo("Gathering project information...")      
+      logInfo("Gathering project information...")
 
       val initX = Project extract state
 
@@ -106,22 +106,22 @@ object EnsimeCommand {
 	  evaluateTask(projectDependencies).getOrElse(List()).map(_.name) ++
 	  proj.aggregate.flatMap(projectRefModuleName)
 	}
-	
+
 	val compileDeps = (
-       	  taskFiles(unmanagedClasspath in Compile) ++ 
-       	  taskFiles(managedClasspath in Compile) ++ 
+       	  taskFiles(unmanagedClasspath in Compile) ++
+       	  taskFiles(managedClasspath in Compile) ++
        	  taskFiles(internalDependencyClasspath in Compile)
 	)
 	val testDeps = (
        	  taskFiles(unmanagedClasspath in Test) ++
-       	  taskFiles(managedClasspath in Test) ++ 
-       	  taskFiles(internalDependencyClasspath in Test) ++ 
+       	  taskFiles(managedClasspath in Test) ++
+       	  taskFiles(internalDependencyClasspath in Test) ++
        	  taskFiles(exportedProducts in Test)
 	)
 	val runtimeDeps = (
        	  taskFiles(unmanagedClasspath in Runtime) ++
        	  taskFiles(managedClasspath in Runtime) ++
-       	  taskFiles(internalDependencyClasspath in Runtime) ++ 
+       	  taskFiles(internalDependencyClasspath in Runtime) ++
        	  taskFiles(exportedProducts in Runtime)
 	)
 
@@ -131,6 +131,7 @@ object EnsimeCommand {
 	)
 
 	val target = optSetting(classDirectory in Compile).map(_.getCanonicalPath)
+	val testTarget = optSetting(classDirectory in Test).map(_.getCanonicalPath)
 
 	val userDefined = optSetting(ensimeConfig).
 	getOrElse(SExpList(List[SExp]())).toKeywordMap
@@ -145,7 +146,9 @@ object EnsimeCommand {
 	  key(":runtime-deps") -> SExp(runtimeDeps.map(SExp.apply)),
 	  key(":test-deps") -> SExp(testDeps.map(SExp.apply)),
 	  key(":source-roots") -> SExp(sourceRoots.map(SExp.apply)),
-	  key(":target") -> target.map(SExp.apply).getOrElse(NilAtom()))
+	  key(":target") -> target.map(SExp.apply).getOrElse(NilAtom()),
+	  key(":test-target") -> testTarget.map(SExp.apply).getOrElse(NilAtom()),
+	)
 
 	simpleMerge(userDefined, thisModule)
       }.toList

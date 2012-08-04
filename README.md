@@ -4,9 +4,9 @@ An sbt plugin that supports integration with the ENSIME IDE.
 
 ## Versions
 
-__For use with ensime 0.9.0+__
+__For use with ensime 0.9+
 
-0.0.10
+0.0.11
 
 
 ## How to Install

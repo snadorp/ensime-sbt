@@ -4,18 +4,18 @@ name := "ensime-sbt-cmd"
 
 organization := "org.ensime"
 
-version := "0.0.10"
+version := "0.1.0"
 
 //pgpSecretRing := file("/Users/aemon/.gnupg/secring.gpg")
 
-crossScalaVersions := Seq("2.9.0","2.9.1","2.9.1-1","2.9.2")
+crossScalaVersions := Seq("2.9.0","2.9.1","2.9.1-1","2.9.2", "2.10.0-M6")
 
 scalacOptions := Seq("-deprecation", "-unchecked")
 
 publishTo <<= version { (v: String) =>
   val nexus = "https://oss.sonatype.org/"
-  if (v.trim.endsWith("SNAPSHOT")) 
-    Some("snapshots" at nexus + "content/repositories/snapshots") 
+  if (v.trim.endsWith("SNAPSHOT"))
+    Some("snapshots" at nexus + "content/repositories/snapshots")
   else
     Some("releases"  at nexus + "service/local/staging/deploy/maven2")
 }
