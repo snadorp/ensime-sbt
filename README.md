@@ -6,7 +6,7 @@ An sbt plugin that supports integration with the ENSIME IDE.
 
 __For use with ensime 0.9+
 
-0.0.11
+0.1.0
 
 
 ## How to Install
