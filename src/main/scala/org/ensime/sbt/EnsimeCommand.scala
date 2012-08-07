@@ -147,7 +147,7 @@ object EnsimeCommand {
 	  key(":test-deps") -> SExp(testDeps.map(SExp.apply)),
 	  key(":source-roots") -> SExp(sourceRoots.map(SExp.apply)),
 	  key(":target") -> target.map(SExp.apply).getOrElse(NilAtom()),
-	  key(":test-target") -> testTarget.map(SExp.apply).getOrElse(NilAtom()),
+	  key(":test-target") -> testTarget.map(SExp.apply).getOrElse(NilAtom())
 	)
 
 	simpleMerge(userDefined, thisModule)
