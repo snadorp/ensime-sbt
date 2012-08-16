@@ -37,8 +37,8 @@ object EnsimeCommand {
   import CommandSupport.logger
 
   val ensimeCommand = "ensime"
-  val ensimeBrief = (ensimeCommand + " dump <project> <outputFile>",
-    "Dump project for <project> information to <outputFile>.")
+  val ensimeBrief = (ensimeCommand + " generate",
+    "Write .ensime file to project's root directory.")
   val ensimeDetailed = ""
 
   type KeyMap = Map[KeywordAtom, SExp]
