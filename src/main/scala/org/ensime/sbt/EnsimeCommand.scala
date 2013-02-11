@@ -108,26 +108,26 @@ object EnsimeCommand {
         }
 
         val compileDeps = (
-                 taskFiles(unmanagedClasspath in Compile) ++
-                 taskFiles(managedClasspath in Compile) ++
-                 taskFiles(internalDependencyClasspath in Compile)
+          taskFiles(unmanagedClasspath in Compile) ++
+          taskFiles(managedClasspath in Compile) ++
+          taskFiles(internalDependencyClasspath in Compile)
         )
         val testDeps = (
-                 taskFiles(unmanagedClasspath in Test) ++
-                 taskFiles(managedClasspath in Test) ++
-                 taskFiles(internalDependencyClasspath in Test) ++
-                 taskFiles(exportedProducts in Test)
+          taskFiles(unmanagedClasspath in Test) ++
+          taskFiles(managedClasspath in Test) ++
+          taskFiles(internalDependencyClasspath in Test) ++
+          taskFiles(exportedProducts in Test)
         )
         val runtimeDeps = (
-                 taskFiles(unmanagedClasspath in Runtime) ++
-                 taskFiles(managedClasspath in Runtime) ++
-                 taskFiles(internalDependencyClasspath in Runtime) ++
-                 taskFiles(exportedProducts in Runtime)
+          taskFiles(unmanagedClasspath in Runtime) ++
+          taskFiles(managedClasspath in Runtime) ++
+          taskFiles(internalDependencyClasspath in Runtime) ++
+          taskFiles(exportedProducts in Runtime)
         )
 
         val sourceRoots =  (
-                 settingFiles(sourceDirectories in Compile) ++
-                 settingFiles(sourceDirectories in Test)
+          settingFiles(sourceDirectories in Compile) ++
+          settingFiles(sourceDirectories in Test)
         )
 
         val target = optSetting(classDirectory in Compile).map(_.getCanonicalPath)
@@ -154,8 +154,8 @@ object EnsimeCommand {
       }.toList
 
       val result = SExp(Map(
-          key(":subprojects") -> SExp(projs.map{p => SExp(p)})
-        )).toPPReadableString
+        key(":subprojects") -> SExp(projs.map{p => SExp(p)})
+      )).toPPReadableString
 
       val file = rest.headOption.getOrElse(".ensime")
       IO.write(new JavaFile(file), result)
