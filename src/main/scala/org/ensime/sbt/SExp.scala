@@ -43,7 +43,20 @@ case class SExpList(items: Iterable[SExp]) extends SExp with Iterable[SExp] {
   override def toString = "(" + items.mkString(" ") + ")"
 
   override def toPPReadableString = {
-    "(" + items.map { _.toPPReadableString }.mkString("\n") + ")"
+    def indent(s: String): String = {
+      val indentation = "  "
+      s.split("\n").map(indentation + _).mkString("\n")
+    }
+    def group(items: List[SExp]): List[String] = items match {
+      case KeywordAtom(kw) :: value :: tl =>
+        val item = indent(kw) + " " + indent(value.toPPReadableString).replaceAll("^\\s+", "") // trimLeft
+        item :: group(tl)
+      case hd :: tl =>
+        indent(hd.toPPReadableString) :: group(tl)
+      case Nil =>
+        Nil
+    }
+    "(\n" + group(items.toList).mkString("\n") + "\n)"
   }
 
   override def toReadableString = {
