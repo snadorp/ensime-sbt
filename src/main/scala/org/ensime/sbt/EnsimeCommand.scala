@@ -136,9 +136,14 @@ object EnsimeCommand {
         userDefined simpleMerge thisModule
       }.toList
 
-      val result = SExp(KeyMap(
-        key(":subprojects") -> SExp(projs.map{p => SExp(p)})
-      )).toPPReadableString
+      val body = SExp(KeyMap(
+          key(":subprojects") -> SExp(projs.map{p => SExp(p)})
+        )).toPPReadableString
+      val header =
+        ";; If your project contains a lot of files, it is advisable to enable (:disable-source-load-on-startup t)\n" +
+        ";; Otherwise Ensime might incur a massive lag at startup time\n" +
+        ";; See more information about that at http://aemoncannon.github.com/ensime/index.html"
+      val result = header + "\n\n" + body
 
       val file = rest.headOption.getOrElse(".ensime")
       IO.write(new JavaFile(file), result)
