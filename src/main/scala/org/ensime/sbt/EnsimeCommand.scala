@@ -41,23 +41,6 @@ object EnsimeCommand {
     "Write .ensime file to project's root directory.")
   val ensimeDetailed = ""
 
-  type KeyMap = Map[KeywordAtom, SExp]
-
-  private def simpleMerge(m1:KeyMap, m2:KeyMap):KeyMap = {
-    val keys = Set() ++ m1.keys ++ m2.keys
-    val merged: Map[KeywordAtom, SExp] = keys.map{ key =>
-      (m1.get(key), m2.get(key)) match{
-        case (Some(s1),None) => (key, s1)
-        case (None,Some(s2)) => (key, s2)
-        case (Some(SExpList(items1)),
-          Some(SExpList(items2))) => (key, SExpList(items1 ++ items2))
-        case (Some(s1:SExp),Some(s2:SExp)) => (key, s2)
-        case _ => (key, NilAtom())
-      }
-    }.toMap
-    merged
-  }
-
   def ensime = Command.args(ensimeCommand, ensimeBrief, ensimeDetailed, "huh?"){
     case (state,"generate"::rest) =>  {
 
@@ -136,7 +119,7 @@ object EnsimeCommand {
         val userDefined = optSetting(ensimeConfig).
         getOrElse(SExpList(List[SExp]())).toKeywordMap
 
-        val thisModule = Map[KeywordAtom,SExp](
+        val thisModule = KeyMap(
           key(":name") -> name.map(SExp.apply).getOrElse(NilAtom()),
           key(":module-name") -> modName.map(SExp.apply).getOrElse(NilAtom()),
           key(":depends-on-modules") -> SExpList(modDeps.map(SExp.apply)),
@@ -150,10 +133,10 @@ object EnsimeCommand {
           key(":test-target") -> testTarget.map(SExp.apply).getOrElse(NilAtom())
         )
 
-        simpleMerge(userDefined, thisModule)
+        userDefined simpleMerge thisModule
       }.toList
 
-      val result = SExp(Map(
+      val result = SExp(KeyMap(
         key(":subprojects") -> SExp(projs.map{p => SExp(p)})
       )).toPPReadableString
 

@@ -25,8 +25,8 @@
 *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-package org.ensime.sbt.util
-import scala.collection.immutable.Map
+package org.ensime.sbt
+package util
 import scala.util.parsing.combinator._
 import scala.util.parsing.input
 
@@ -63,8 +63,8 @@ case class SExpList(items: Iterable[SExp]) extends SExp with Iterable[SExp] {
     "(" + items.map { _.toReadableString }.mkString(" ") + ")"
   }
 
-  def toKeywordMap(): Map[KeywordAtom, SExp] = {
-    var m = Map[KeywordAtom, SExp]()
+  def toKeywordMap(): KeyMap = {
+    var m = KeyMap()
     items.toList.sliding(2, 2).foreach {
       case (key: KeywordAtom) :: (sexp: SExp) :: rest => {
         m += (key -> sexp)
@@ -74,8 +74,8 @@ case class SExpList(items: Iterable[SExp]) extends SExp with Iterable[SExp] {
     m
   }
 
-  def toSymbolMap(): Map[scala.Symbol, Any] = {
-    var m = Map[scala.Symbol, Any]()
+  def toSymbolMap(): SymMap = {
+    var m = SymMap()
     items.sliding(2, 2).foreach {
       case SymbolAtom(key) ::(sexp: SExp) :: rest => {
         m += (Symbol(key) -> sexp.toScala)
@@ -188,7 +188,7 @@ object SExp extends RegexParsers {
 
   def apply(items: Iterable[SExp]): SExpList = sexp(items)
 
-  def apply(map: Map[KeywordAtom, SExp]): SExpList = {
+  def apply(map: KeyMap): SExpList = {
     val buf = scala.collection.mutable.ListBuffer[SExp]()
     map.map{ pair =>
       buf += pair._1
