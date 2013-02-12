@@ -5,14 +5,21 @@ import org.ensime.sbt.util._
 
 package object sbt {
   type KeyMap = ListMap[KeywordAtom, SExp]
-  val KeyMap = (ListMap[KeywordAtom, SExp] _)
+  object KeyMap {
+    def apply(elems: (KeywordAtom, SExp)*) = ListMap[KeywordAtom, SExp]() ++ elems
+  }
 
-  implicit def tuples2TupleKeyMapOps(tuples: List[(KeywordAtom, SExp)]): TupleKeyMapOps = new TupleKeyMapOps(tuples)
+  implicit def tuples2TupleKeyMapOps(
+    tuples: List[(KeywordAtom, SExp)]): TupleKeyMapOps =
+      new TupleKeyMapOps(tuples)
+
   class TupleKeyMapOps(tuples: List[(KeywordAtom, SExp)]) {
     def toKeyMap: KeyMap = KeyMap() ++ tuples
   }
 
-  implicit def keyMap2KeyMapOps(keyMap: KeyMap): KeyMapOps = new KeyMapOps(keyMap)
+  implicit def keyMap2KeyMapOps(keyMap: KeyMap): KeyMapOps =
+    new KeyMapOps(keyMap)
+
   class KeyMapOps(m1: KeyMap) {
     def simpleMerge(m2:KeyMap):KeyMap = {
       val keys = m1.keys.toList.diff(m2.keys.toList) ++ m2.keys
@@ -31,5 +38,7 @@ package object sbt {
   }
 
   type SymMap = ListMap[scala.Symbol, Any]
-  val SymMap = (ListMap[scala.Symbol, Any] _)
+  object SymMap {
+    def apply(elems: (scala.Symbol, Any)*) = ListMap[scala.Symbol, Any]() ++ elems
+  }
 }
