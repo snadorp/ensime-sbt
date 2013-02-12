@@ -1,12 +1,12 @@
 # ENSIME-sbt-cmd 
-An sbt plugin that supports integration with the ENSIME IDE.
+An sbt plugin that supports integration with the ENSIME server.
 
 
 ## Versions
 
-__For use with ensime 0.9+
+__For use with ENSIME 0.9+
 
-0.1.0
+0.1.1
 
 
 ## How to Install

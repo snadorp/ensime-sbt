@@ -8,7 +8,7 @@ version := "0.1.1"
 
 //pgpSecretRing := file("/Users/aemon/.gnupg/secring.gpg")
 
-crossScalaVersions := Seq("2.9.0","2.9.1","2.9.1-1","2.9.2", "2.10.0-M6")
+crossScalaVersions := Seq("2.9.2", "2.10.0")
 
 scalacOptions := Seq("-deprecation", "-unchecked")
 
