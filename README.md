@@ -6,7 +6,7 @@ An sbt plugin that supports integration with the ENSIME server.
 
 __For use with ENSIME 0.9+
 
-0.1.1
+0.1.2
 
 
 ## How to Install

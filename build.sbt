@@ -4,11 +4,11 @@ name := "ensime-sbt-cmd"
 
 organization := "org.ensime"
 
-version := "0.1.1"
+version := "0.1.2"
 
 //pgpSecretRing := file("/Users/aemon/.gnupg/secring.gpg")
 
-crossScalaVersions := Seq("2.9.2", "2.10.0")
+crossScalaVersions := Seq("2.10.2")
 
 scalacOptions := Seq("-deprecation", "-unchecked")
 
