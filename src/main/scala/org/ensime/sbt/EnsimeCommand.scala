@@ -36,12 +36,23 @@ object EnsimeCommand {
   import Keys._
 
   val ensimeCommand = "ensime"
-  val ensimeBrief = (ensimeCommand + " generate",
+  val ensimeCmdLine = ensimeCommand + " generate [-s] [<ensime-file-name>]"
+  val ensimeBrief = (ensimeCmdLine,
     "Write .ensime file to project's root directory.")
-  val ensimeDetailed = ""
+  val ensimeDetailed = ensimeCmdLine + """
+
+Write a .ensime configuration file. With the "-s" option, the source
+jars of dependencies are downloaded and their location is written to
+the configuration."""
 
   def ensime = Command.args(ensimeCommand, ensimeBrief, ensimeDetailed, "huh?"){
     case (state,"generate"::rest) =>  {
+
+      val (downloadSources, file_rest) = rest match {
+        case "-s" :: r => (true, r)
+        case r => (false, r)
+      }
+      val configFile = file_rest.headOption.getOrElse(".ensime")
 
       def logInfo(message: String) {
         state.log.info(message);
@@ -112,6 +123,18 @@ object EnsimeCommand {
           settingFiles(sourceDirectories in Test)
         )
 
+        val referenceSources = if (downloadSources) {
+          evaluateTask(updateClassifiers) match {
+            case Some(updateReport) => updateReport.select(
+              configuration = Set("compile", "test"),
+              artifact = artifactFilter(classifier = "sources")
+            ).map(_.getPath).toList
+            case None => List[String]()
+          }
+        } else {
+          List[String]()
+        }
+
         val target = optSetting(classDirectory in Compile).map(_.getCanonicalPath)
         val testTarget = optSetting(classDirectory in Test).map(_.getCanonicalPath)
 
@@ -128,6 +151,7 @@ object EnsimeCommand {
           key(":runtime-deps") -> SExp(runtimeDeps.map(SExp.apply)),
           key(":test-deps") -> SExp(testDeps.map(SExp.apply)),
           key(":source-roots") -> SExp(sourceRoots.map(SExp.apply)),
+          key(":reference-source-roots") -> SExp(referenceSources.map(SExp.apply)),
           key(":target") -> target.map(SExp.apply).getOrElse(NilAtom()),
           key(":test-target") -> testTarget.map(SExp.apply).getOrElse(NilAtom())
         )
@@ -144,9 +168,8 @@ object EnsimeCommand {
         ";; See more information about that at http://aemoncannon.github.com/ensime/index.html"
       val result = header + "\n\n" + body
 
-      val file = rest.headOption.getOrElse(".ensime")
-      IO.write(new JavaFile(file), result)
-      state.log.info("Wrote configuration to " + file)
+      IO.write(new JavaFile(configFile), result)
+      state.log.info("Wrote configuration to " + configFile)
       state
     }
     case (state,args) => {
