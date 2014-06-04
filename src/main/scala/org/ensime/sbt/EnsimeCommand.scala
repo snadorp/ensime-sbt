@@ -45,139 +45,141 @@ Write a .ensime configuration file. With the "-s" option, the source
 jars of dependencies are downloaded and their location is written to
 the configuration."""
 
-  def ensime = Command.args(ensimeCommand, ensimeBrief, ensimeDetailed, "huh?"){
-    case (state,"generate"::rest) =>  {
-
-      val (downloadSources, file_rest) = rest match {
-        case "-s" :: r => (true, r)
-        case r => (false, r)
-      }
-      val configFile = file_rest.headOption.getOrElse(".ensime")
-
-      def logInfo(message: String) {
-        state.log.info(message);
-      }
-
-      def logErrorAndFail(errorMessage: String): Nothing = {
-        state.log.error(errorMessage);
-        throw new IllegalArgumentException()
-      }
-
-      logInfo("Gathering project information...")
-
-      val initX = Project extract state
-
-
-      val projs:List[KeyMap] = initX.structure.allProjects.map{
-        proj =>
-
-        import Compat._
-
-        implicit val s = state
-
-        implicit val show:Show[ScopedKey[_]] = Project.showContextKey(s)
-
-        implicit val projRef = ProjectRef(s.configuration.baseDirectory, proj.id)
-        logInfo("Processing project: " + projRef + "...")
-
-        implicit val x = Extracted(initX.structure, initX.session, projRef)
-        implicit val buildStruct = x.structure
-        val session = x.session
-
-        val name = optSetting(Keys.name)
-        val org = optSetting(organization)
-        val projectVersion = optSetting(version)
-        val buildScalaVersion = optSetting(scalaVersion)
-        val (scalaVersionSuper, scalaVersionMajor) = buildScalaVersion.flatMap(CrossVersion.partialVersion(_)) getOrElse ((2,10))
-
-        val modName = optSetting(moduleName)
-
-        def projectRefModuleName(ref:ProjectRef):Option[String] = {
-          implicit val x = Extracted(initX.structure, initX.session, ref)
-          implicit val buildStruct = x.structure
-          optSetting(moduleName)
-        }
-        val modDeps = {
-          evaluateTask(projectDependencies).getOrElse(List()).map(_.name) ++
-          proj.aggregate.flatMap(projectRefModuleName)
-        }
-
-        val compileDeps = (
-          taskFiles(unmanagedClasspath in Compile) ++
-          taskFiles(managedClasspath in Compile) ++
-          taskFiles(internalDependencyClasspath in Compile)
-        )
-        val testDeps = (
-          taskFiles(unmanagedClasspath in Test) ++
-          taskFiles(managedClasspath in Test) ++
-          taskFiles(internalDependencyClasspath in Test) ++
-          taskFiles(exportedProducts in Test)
-        )
-        val runtimeDeps = (
-          taskFiles(unmanagedClasspath in Runtime) ++
-          taskFiles(managedClasspath in Runtime) ++
-          taskFiles(internalDependencyClasspath in Runtime) ++
-          taskFiles(exportedProducts in Runtime)
-        )
-
-        val sourceRoots =  (
-          settingFiles(sourceDirectories in Compile) ++
-          settingFiles(sourceDirectories in Test)
-        )
-
-        val referenceSources = if (downloadSources) {
-          evaluateTask(updateClassifiers) match {
-            case Some(updateReport) => updateReport.select(
-              configuration = Set("compile", "test"),
-              artifact = artifactFilter(classifier = "sources")
-            ).map(_.getPath).toList
-            case None => List[String]()
-          }
-        } else {
-          List[String]()
-        }
-
-        val target = optSetting(classDirectory in Compile).map(_.getCanonicalPath)
-        val testTarget = optSetting(classDirectory in Test).map(_.getCanonicalPath)
-
-        val userDefined = optSetting(ensimeConfig).
-        getOrElse(SExpList(List[SExp]())).toKeywordMap
-
-        val thisModule = KeyMap(
-          key(":name") -> name.map(SExp.apply).getOrElse(NilAtom()),
-          key(":module-name") -> modName.map(SExp.apply).getOrElse(NilAtom()),
-          key(":depends-on-modules") -> SExpList(modDeps.map(SExp.apply)),
-          key(":package") -> org.map(SExp.apply).getOrElse(NilAtom()),
-          key(":version") -> projectVersion.map(SExp.apply).getOrElse(NilAtom()),
-          key(":compile-deps") -> SExp(compileDeps.map(SExp.apply)),
-          key(":runtime-deps") -> SExp(runtimeDeps.map(SExp.apply)),
-          key(":test-deps") -> SExp(testDeps.map(SExp.apply)),
-          key(":source-roots") -> SExp(sourceRoots.map(SExp.apply)),
-          key(":scala-version") -> SExp(s"${scalaVersionSuper}.${scalaVersionMajor}"),
-          key(":reference-source-roots") -> SExp(referenceSources.map(SExp.apply)),
-          key(":target") -> target.map(SExp.apply).getOrElse(NilAtom()),
-          key(":test-target") -> testTarget.map(SExp.apply).getOrElse(NilAtom())
-        )
-
-        userDefined simpleMerge thisModule
-      }.toList
-
-      val body = SExp(KeyMap(
-          key(":subprojects") -> SExp(projs.map{p => SExp(p)})
-        )).toPPReadableString
-      val header =
-        ";; If your project contains a lot of files, it is advisable to enable (:disable-source-load-on-startup t)\n" +
-        ";; Otherwise Ensime might incur a massive lag at startup time\n" +
-        ";; See more information about that at http://aemoncannon.github.com/ensime/index.html"
-      val result = header + "\n\n" + body
-
-      IO.write(new JavaFile(configFile), result)
-      state.log.info("Wrote configuration to " + configFile)
-      state
+  def ensimeGenerate(state: sbt.State, args: Seq[String]) = {
+    val (downloadSources, file_rest) = args match {
+      case "-s" :: r => (true, r)
+      case r => (false, r)
     }
-    case (state,args) => {
+    val configFile = file_rest.headOption.getOrElse(".ensime")
+
+    def logInfo(message: String) {
+      state.log.info(message);
+    }
+
+    def logErrorAndFail(errorMessage: String): Nothing = {
+      state.log.error(errorMessage);
+      throw new IllegalArgumentException()
+    }
+
+    logInfo("Gathering project information...")
+
+    val initX = Project extract state
+
+
+    val projs:List[KeyMap] = initX.structure.allProjects.map{
+      proj =>
+
+      import Compat._
+
+      implicit val s = state
+
+      implicit val show:Show[ScopedKey[_]] = Project.showContextKey(s)
+
+      implicit val projRef = ProjectRef(s.configuration.baseDirectory, proj.id)
+      logInfo("Processing project: " + projRef + "...")
+
+      implicit val x = Extracted(initX.structure, initX.session, projRef)
+      implicit val buildStruct = x.structure
+      val session = x.session
+
+      val name = optSetting(Keys.name)
+      val org = optSetting(organization)
+      val projectVersion = optSetting(version)
+      val buildScalaVersion = optSetting(scalaVersion)
+      val (scalaVersionSuper, scalaVersionMajor) = buildScalaVersion.flatMap(CrossVersion.partialVersion(_)) getOrElse ((2,10))
+
+      val modName = optSetting(moduleName)
+
+      def projectRefModuleName(ref:ProjectRef):Option[String] = {
+        implicit val x = Extracted(initX.structure, initX.session, ref)
+        implicit val buildStruct = x.structure
+        optSetting(moduleName)
+      }
+      val modDeps = {
+        evaluateTask(projectDependencies).getOrElse(List()).map(_.name) ++
+        proj.aggregate.flatMap(projectRefModuleName)
+      }
+
+      val compileDeps = (
+        taskFiles(unmanagedClasspath in Compile) ++
+        taskFiles(managedClasspath in Compile) ++
+        taskFiles(internalDependencyClasspath in Compile)
+      )
+      val testDeps = (
+        taskFiles(unmanagedClasspath in Test) ++
+        taskFiles(managedClasspath in Test) ++
+        taskFiles(internalDependencyClasspath in Test) ++
+        taskFiles(exportedProducts in Test)
+      )
+      val runtimeDeps = (
+        taskFiles(unmanagedClasspath in Runtime) ++
+        taskFiles(managedClasspath in Runtime) ++
+        taskFiles(internalDependencyClasspath in Runtime) ++
+        taskFiles(exportedProducts in Runtime)
+      )
+
+      val sourceRoots =  (
+        settingFiles(sourceDirectories in Compile) ++
+        settingFiles(sourceDirectories in Test)
+      )
+
+      val referenceSources = if (downloadSources) {
+        evaluateTask(updateClassifiers) match {
+          case Some(updateReport) => updateReport.select(
+            configuration = Set("compile", "test"),
+            artifact = artifactFilter(classifier = "sources")
+          ).map(_.getPath).toList
+          case None => List[String]()
+        }
+      } else {
+        List[String]()
+      }
+
+      val target = optSetting(classDirectory in Compile).map(_.getCanonicalPath)
+      val testTarget = optSetting(classDirectory in Test).map(_.getCanonicalPath)
+
+      val userDefined = optSetting(ensimeConfig).
+      getOrElse(SExpList(List[SExp]())).toKeywordMap
+
+      val thisModule = KeyMap(
+        key(":name") -> name.map(SExp.apply).getOrElse(NilAtom()),
+        key(":module-name") -> modName.map(SExp.apply).getOrElse(NilAtom()),
+        key(":depends-on-modules") -> SExpList(modDeps.map(SExp.apply)),
+        key(":package") -> org.map(SExp.apply).getOrElse(NilAtom()),
+        key(":version") -> projectVersion.map(SExp.apply).getOrElse(NilAtom()),
+        key(":compile-deps") -> SExp(compileDeps.map(SExp.apply)),
+        key(":runtime-deps") -> SExp(runtimeDeps.map(SExp.apply)),
+        key(":test-deps") -> SExp(testDeps.map(SExp.apply)),
+        key(":source-roots") -> SExp(sourceRoots.map(SExp.apply)),
+        key(":scala-version") -> SExp(s"${scalaVersionSuper}.${scalaVersionMajor}"),
+        key(":reference-source-roots") -> SExp(referenceSources.map(SExp.apply)),
+        key(":target") -> target.map(SExp.apply).getOrElse(NilAtom()),
+        key(":test-target") -> testTarget.map(SExp.apply).getOrElse(NilAtom())
+      )
+
+      userDefined simpleMerge thisModule
+    }.toList
+
+    val body = SExp(KeyMap(
+        key(":subprojects") -> SExp(projs.map{p => SExp(p)})
+      )).toPPReadableString
+    val header =
+      ";; If your project contains a lot of files, it is advisable to enable (:disable-source-load-on-startup t)\n" +
+      ";; Otherwise Ensime might incur a massive lag at startup time\n" +
+      ";; See more information about that at http://aemoncannon.github.com/ensime/index.html"
+    val result = header + "\n\n" + body
+
+    IO.write(new JavaFile(configFile), result)
+    state.log.info("Wrote configuration to " + configFile)
+    state
+  }
+
+  def ensime = Command.args(ensimeCommand, ensimeBrief, ensimeDetailed, "huh?") {
+    case (state,"help"::rest) => {
       state.log.info(ensimeBrief._1)
       state
     }
+    case (state,"generate"::rest) => ensimeGenerate(state, rest) // backwards compat
+    case (state,args) => ensimeGenerate(state, args)
   }
 }
