@@ -1,4 +1,4 @@
-# ENSIME-sbt-cmd
+# ENSIME-sbt
 An sbt plugin that supports integration with the ENSIME server.
 
 
@@ -13,7 +13,7 @@ __For use with ENSIME 0.9+__
 ## How to Install
 Add the following to your `~/.sbt/plugins/plugins.sbt` or YOUR_PROJECT/project/plugins.sbt:
 
-    addSbtPlugin("org.ensime" % "ensime-sbt-cmd" % "VERSION")
+    addSbtPlugin("org.ensime" % "ensime-sbt" % "VERSION")
 
 Adding the line above to YOUR_PROJECT/build.sbt won't activate the plugin, you must add it one level above, to either YOUR_PROJECT/project/plugins.sbt or YOUR_PROJECT/project/build.sbt.
 

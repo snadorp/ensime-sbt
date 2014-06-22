@@ -1,6 +1,6 @@
 sbtPlugin := true
 
-name := "ensime-sbt-cmd"
+name := "ensime-sbt"
 
 organization := "org.ensime"
 
@@ -35,17 +35,17 @@ publishMavenStyle := true
 pomIncludeRepository := { _ => false }
 
 pomExtra := (
-  <url>http://github.com/aemoncannon/ensime-sbt-cmd</url>
+  <url>http://github.com/ensime/ensime-sbt</url>
   <licenses>
     <license>
       <name>BSD-style</name>
       <url>http://www.opensource.org/licenses/bsd-license.php</url>
-      <distribution>http://github.com/aemoncannon/ensime-sbt-cmd</distribution>
+      <distribution>http://github.com/ensime/ensime-sbt</distribution>
     </license>
   </licenses>
   <scm>
-    <url>git@github.com:aemoncannon/ensime-sbt-cmd.git</url>
-    <connection>scm:git:git@github.com:aemoncannon/ensime-sbt-cmd.git</connection>
+    <url>git@github.com:ensime/ensime-sbt.git</url>
+    <connection>scm:git:git@github.com:ensime/ensime-sbt.git</connection>
   </scm>
   <developers>
     <developer>
