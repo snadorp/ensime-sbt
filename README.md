@@ -6,7 +6,7 @@ An sbt plugin that supports integration with the ENSIME server.
 
 __For use with ENSIME 0.9+__
 
-* 0.1.3 for scala 2.10 and sbt 0.13
+* 0.1.4 for scala 2.10 and sbt 0.13
 * 0.1.1 for scala 2.9/2.10 and sbt 0.12
 
 
