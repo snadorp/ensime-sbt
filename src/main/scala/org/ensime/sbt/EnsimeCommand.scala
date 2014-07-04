@@ -141,6 +141,10 @@ the configuration."""
       val userDefined = optSetting(ensimeConfig).
       getOrElse(SExpList(List[SExp]())).toKeywordMap
 
+      val compilerArgs:Seq[String] = {
+        evaluateTask(scalacOptions in Compile).getOrElse(Nil)
+      }
+
       val thisModule = KeyMap(
         key(":name") -> name.map(SExp.apply).getOrElse(NilAtom()),
         key(":module-name") -> modName.map(SExp.apply).getOrElse(NilAtom()),
@@ -154,7 +158,8 @@ the configuration."""
         key(":scala-version") -> SExp(s"${scalaVersionSuper}.${scalaVersionMajor}"),
         key(":reference-source-roots") -> SExp(referenceSources.map(SExp.apply)),
         key(":target") -> target.map(SExp.apply).getOrElse(NilAtom()),
-        key(":test-target") -> testTarget.map(SExp.apply).getOrElse(NilAtom())
+        key(":test-target") -> testTarget.map(SExp.apply).getOrElse(NilAtom()),
+        key(":compiler-args") -> SExp(compilerArgs.map(SExp.apply))
       )
 
       userDefined simpleMerge thisModule
