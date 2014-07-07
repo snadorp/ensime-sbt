@@ -9,5 +9,5 @@ env:
   global:
     # travis encrypt -r ensime/ensime-sbt SONATYPE_USERNAME=<USERNAME>
     # travis encrypt -r ensime/ensime-sbt SONATYPE_PASSWORD=<PASSWORD>
-   secure: "pTYXca/IKVkjf2zixORImrllZR7H/zPW1Xnted6eb9LjnUo/xiSf7Klg3nwDEgQpAcf4I7k4a9BjVm1mdUjlvJQ6StM62B3Id6rRp50O5tAr6NzzB9u42NG2zKHw2GhjBiNKm6nKetbC4Jbh2KeCc8OG8rvwj/8dKNlOBb297oI="
-   secure: "Pn1Cc7GiWI2KGSd96zC7ebRjh5eVoURZREZ+Vi6t3Gx9Jqt4C3pkrAAAIKyEnginGLrQN0L+XiVDaQpnoDtLwwMlaPpiOjEYt9wvFzbFv+uz4vwASffs7oN6BW1wAf62r8hbZYXyTkYf/twmpMUFisEN/OAMBHOwVVFpg6KWpt8="
+   - secure: "pTYXca/IKVkjf2zixORImrllZR7H/zPW1Xnted6eb9LjnUo/xiSf7Klg3nwDEgQpAcf4I7k4a9BjVm1mdUjlvJQ6StM62B3Id6rRp50O5tAr6NzzB9u42NG2zKHw2GhjBiNKm6nKetbC4Jbh2KeCc8OG8rvwj/8dKNlOBb297oI="
+   - secure: "Pn1Cc7GiWI2KGSd96zC7ebRjh5eVoURZREZ+Vi6t3Gx9Jqt4C3pkrAAAIKyEnginGLrQN0L+XiVDaQpnoDtLwwMlaPpiOjEYt9wvFzbFv+uz4vwASffs7oN6BW1wAf62r8hbZYXyTkYf/twmpMUFisEN/OAMBHOwVVFpg6KWpt8="
