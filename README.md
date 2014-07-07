@@ -1,35 +1,51 @@
-# ENSIME-sbt
-An sbt plugin that supports integration with the ENSIME server.
+# ENSIME SBT
+
+This [sbt](http://github.com/sbt/sbt) plugin generates a `.ensime`
+file for use with an
+[ENSIME server](http://github.com/ensime/ensime-server).
+
+The ENSIME ecosystem is actively developed and always looking for new
+contributors. This is a fairly small and easy to understand plugin, so
+please consider sending us a Pull Request if you have any feature
+request ideas.
 
 
-## Versions
+## Installation
 
-__For use with ENSIME 0.9+__
+ENSIME is effectively using a rolling release strategy until version
+1.0. Therefore, the latest plugin is available by adding the following
+to your `project/plugins.sbt`:
 
-* 0.1.4 for scala 2.10 and sbt 0.13
-* 0.1.1 for scala 2.9/2.10 and sbt 0.12
+
+```scala
+    resolvers += Resolver.sonatypeRepo("snapshots")
+
+    addSbtPlugin("org.ensime" % "ensime-sbt" % "0.1.5-SNAPSHOT")
+```
+
+Only sbt 0.13.x is supported.
+
+An older 0.1.1 release is available for sbt 0.12, but we don't
+recommend it.
 
 
-## How to Install
-Add the following to your `~/.sbt/0.13/plugins/plugins.sbt` (ommit the `0.13` part for older versions of `sbt`) or `YOUR_PROJECT/project/plugins.sbt`:
+## Using
 
-    addSbtPlugin("org.ensime" % "ensime-sbt" % "VERSION")
+Type `sbt 'ensime generate -s'` or, from the sbt prompt:
 
-Adding the line above to YOUR_PROJECT/build.sbt won't activate the plugin, you must add it one level above, to either YOUR_PROJECT/project/plugins.sbt or YOUR_PROJECT/project/build.sbt.
+```
+ensime generate -s
+```
 
-## How to Use
-The above automatically adds the `ensime generate` command to your sbt build. This command will write a .ensime file to your project's root directory.
+leave off the `-s` if you don't want source jars to be downloaded and
+referenced in the resulting `.ensime` file.
 
-The `ensime generate -s` command causes sbt to download the source jars of your project's dependencies (as with `update-classifiers`) and include their paths in the .ensime file. This is only useful with a recent version of Ensime that can navigate to source jars.
 
-Note: Currently, it may be necessary to first delete your project/target directories before running 'ensime generate'.
+## Developers / Workarounds
 
-### Use locally compiled version
-Clone the repository to your local machine and run
+Fork and clone this repository, (optionally: add awesomeness), and
+then:
 
-    sbt publishLocal
-
-Change the plugin version in your `plugins.sbt` file to the one declared in the `ensime-sbt/build.sbt`.
-
-## License
-BSD License
+```
+sbt publishLocal
+```

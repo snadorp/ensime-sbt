@@ -3,12 +3,11 @@ jdk:
 - openjdk6
 scala:
 - 2.10.4
-before_script:
-- ./bintray.sh
 after_success:
 - sbt publish
 env:
   global:
-    # to generate this (when in the correct branch of the correct repo):
-    # travis encrypt BINTRAY_TOKEN=<YOUR PRIVATE API KEY> --add
-    secure: EJtrMVOVD5ajjAcmjRh0CrO/v+REjcNvCX+R9kdrNm31NDcuuMCMORjRmC30s0nWeaErLZKoqmIoVfKMI33yF4aloDsgtsxEgXgSHXAQFca9/tlzb+42glEdqMeq4erBL1MgxpvcxJa0Qig24L5+YMpHxRLORwoSJWlmqmO3Suw=
+    # travis encrypt -r ensime/ensime-sbt SONATYPE_USERNAME=<USERNAME>
+    # travis encrypt -r ensime/ensime-sbt SONATYPE_PASSWORD=<PASSWORD>
+    secure: SeRN7GesK/gOi6JeCWmV+eRKzcgz5VCyOJejFiNKSYUTl6oZH1NCQWeReW0XwkYhgug+vHE7kjQAjLOkXEuBtC73UsBOqyPC7iqXWiI+YD9tos746SKQBPK9w37Z1/lI1O0sN4JmbdcGqStoWx14pXgwYT3lRxWqhWsiqK1/+0o=
+    secure: U7UIdwQzCbZy1YSDmoXN+yVPvs1Up4kFUnFkK/AyPlDSYDsJqKkTgWq2dEMVNMaYXTEjhWvptsOueN17NkNua5nbIZd8HPMacFQD6XBHPY/D7fVOKzhPLozOqtfV7JVcGFbs6Ot1eUvRM5S6B3iMp/KB+jwMQOLxjlqNl9iyt+U=
