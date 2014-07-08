@@ -6,7 +6,7 @@ version := "0.1.5-SNAPSHOT"
 
 sbtPlugin := true
 
-publishMavenStyle := false
+publishMavenStyle := true
 
 licenses := Seq("BSD 3 Clause" -> url("http://opensource.org/licenses/BSD-3-Clause"))
 
