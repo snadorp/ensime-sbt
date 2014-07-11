@@ -86,7 +86,6 @@ the configuration."""
       val org = optSetting(organization)
       val projectVersion = optSetting(version)
       val buildScalaVersion = optSetting(scalaVersion)
-      val (scalaVersionSuper, scalaVersionMajor) = buildScalaVersion.flatMap(CrossVersion.partialVersion(_)) getOrElse ((2,10))
 
       val modName = optSetting(moduleName)
 
@@ -155,7 +154,7 @@ the configuration."""
         key(":runtime-deps") -> SExp(runtimeDeps.map(SExp.apply)),
         key(":test-deps") -> SExp(testDeps.map(SExp.apply)),
         key(":source-roots") -> SExp(sourceRoots.map(SExp.apply)),
-        key(":scala-version") -> SExp(s"${scalaVersionSuper}.${scalaVersionMajor}"),
+        key(":scala-version") -> buildScalaVersion.map(SExp.apply).getOrElse(NilAtom()),
         key(":reference-source-roots") -> SExp(referenceSources.map(SExp.apply)),
         key(":target") -> target.map(SExp.apply).getOrElse(NilAtom()),
         key(":test-target") -> testTarget.map(SExp.apply).getOrElse(NilAtom()),
