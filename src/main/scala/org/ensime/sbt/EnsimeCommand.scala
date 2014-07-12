@@ -65,11 +65,10 @@ the configuration."""
 
     val initX = Project extract state
 
+    import Compat._
 
     val projs:List[KeyMap] = initX.structure.allProjects.map{
       proj =>
-
-      import Compat._
 
       implicit val s = state
 
@@ -85,7 +84,6 @@ the configuration."""
       val name = optSetting(Keys.name)
       val org = optSetting(organization)
       val projectVersion = optSetting(version)
-      val buildScalaVersion = optSetting(scalaVersion)
 
       val modName = optSetting(moduleName)
 
@@ -146,6 +144,7 @@ the configuration."""
 
       val thisModule = KeyMap(
         key(":name") -> name.map(SExp.apply).getOrElse(NilAtom()),
+        key(":scala-version") -> optSetting(scalaVersion).map(SExp.apply).getOrElse(NilAtom()),
         key(":module-name") -> modName.map(SExp.apply).getOrElse(NilAtom()),
         key(":depends-on-modules") -> SExpList(modDeps.map(SExp.apply)),
         key(":package") -> org.map(SExp.apply).getOrElse(NilAtom()),
@@ -154,7 +153,6 @@ the configuration."""
         key(":runtime-deps") -> SExp(runtimeDeps.map(SExp.apply)),
         key(":test-deps") -> SExp(testDeps.map(SExp.apply)),
         key(":source-roots") -> SExp(sourceRoots.map(SExp.apply)),
-        key(":scala-version") -> buildScalaVersion.map(SExp.apply).getOrElse(NilAtom()),
         key(":reference-source-roots") -> SExp(referenceSources.map(SExp.apply)),
         key(":target") -> target.map(SExp.apply).getOrElse(NilAtom()),
         key(":test-target") -> testTarget.map(SExp.apply).getOrElse(NilAtom()),
@@ -164,13 +162,17 @@ the configuration."""
       userDefined simpleMerge thisModule
     }.toList
 
+    implicit val x: Extracted = Project extract state
+    implicit val s: State = state
     val body = SExp(KeyMap(
+        key(":name") -> optSetting(name).map(SExp.apply).getOrElse(NilAtom()),
+        key(":scala-version") -> optSetting(scalaVersion).map(SExp.apply).getOrElse(NilAtom()),
         key(":subprojects") -> SExp(projs.map{p => SExp(p)})
       )).toPPReadableString
     val header =
       ";; If your project contains a lot of files, it is advisable to enable (:disable-source-load-on-startup t)\n" +
       ";; Otherwise Ensime might incur a massive lag at startup time\n" +
-      ";; See more information about that at http://aemoncannon.github.com/ensime/index.html"
+      ";; See more information about that at http://ensime.github.io/"
     val result = header + "\n\n" + body
 
     IO.write(new JavaFile(configFile), result)
