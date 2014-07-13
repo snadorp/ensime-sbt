@@ -145,6 +145,7 @@ the configuration."""
       val thisModule = KeyMap(
         key(":name") -> name.map(SExp.apply).getOrElse(NilAtom()),
         key(":scala-version") -> optSetting(scalaVersion).map(SExp.apply).getOrElse(NilAtom()),
+        // having two names seems redundant. in fact there is a lot of redundancy here...
         key(":module-name") -> modName.map(SExp.apply).getOrElse(NilAtom()),
         key(":depends-on-modules") -> SExpList(modDeps.map(SExp.apply)),
         key(":package") -> org.map(SExp.apply).getOrElse(NilAtom()),
@@ -164,9 +165,15 @@ the configuration."""
 
     implicit val x: Extracted = Project extract state
     implicit val s: State = state
+    import scala.util.Properties.propOrNull
+    val javaSrc = {optSetting(javaHome).flatten.getOrElse(file(propOrNull("java.home"))) match {
+      case dir if new File(dir, "src.zip").exists => dir
+      case dir => dir.getParentFile
+    }}.getAbsolutePath + java.io.File.separator + "src.zip"
     val body = SExp(KeyMap(
         key(":name") -> optSetting(name).map(SExp.apply).getOrElse(NilAtom()),
         key(":scala-version") -> optSetting(scalaVersion).map(SExp.apply).getOrElse(NilAtom()),
+        key(":reference-source-roots") -> SExpList(SExp(javaSrc)),
         key(":subprojects") -> SExp(projs.map{p => SExp(p)})
       )).toPPReadableString
     val header =
