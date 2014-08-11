@@ -1,32 +1,8 @@
 .#*
 *.*#
-*.zip
-*.gz
-*.pdf
-*.toc
-*.log
-*.dvi
-*.aux
-*.fdb_latexmk
-*~
-target/
-lib_managed/
-src_managed/
-project/boot/
-project/build/target
-test_data
-one_offs
-dist
-dist_*
-.ensime
-.ensime.bak
-.emacs_clean.el
-etc/pres_compiler.txt
-etc/_region_.tex
-scratch
 
-test_projects/sbt-deps
-test_projects/anti-xml
-test_projects/rogue
+target
+project/project
+project/target
 
-src/main/scala/org/ensime/server/Test.scala
+.ensime*
