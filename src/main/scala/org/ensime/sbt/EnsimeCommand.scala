@@ -173,7 +173,8 @@ the configuration."""
     val body = SExp(KeyMap(
         key(":name") -> optSetting(name).map(SExp.apply).getOrElse(NilAtom()),
         key(":scala-version") -> optSetting(scalaVersion).map(SExp.apply).getOrElse(NilAtom()),
-        key(":reference-source-roots") -> SExpList(SExp(javaSrc)),
+      // See issue #518. Restore this line with that issue is resolved.
+      // key(":reference-source-roots") -> SExpList(SExp(javaSrc)),
         key(":subprojects") -> SExp(projs.map{p => SExp(p)})
       )).toPPReadableString
     val header =
