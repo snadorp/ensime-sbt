@@ -31,14 +31,16 @@ object SExpFormatter {
 
   def toSExp(b: Boolean): String = if (b) "t" else "nil"
 
-  def toSExp(f: IFormattingPreferences): String =
-    if (f.preferencesMap.isEmpty) "nil"
-    else f.preferencesMap.map {
+  def toSExp(o: Option[IFormattingPreferences]): String = o match {
+    case None => ""
+    case Some(f) if f.preferencesMap.isEmpty => ""
+    case Some(f) => f.preferencesMap.map {
       case (desc, v: Boolean) =>
         s":${desc.key} ${toSExp(v)}"
       case (desc, v: Int) =>
         s":${desc.key} $v"
-    }.mkString(" ")
+    }.mkString(":formatting-prefs (", " ", ")")
+  }
 
   // a lot of legacy key names and conventions
   def toSExp(c: EnsimeConfig): String = s"""(
@@ -50,7 +52,7 @@ object SExpFormatter {
  :reference-source-roots ${fsToSExp(c.javaSrc.toIterable)}
  :scala-version ${toSExp(c.scalaVersion)}
  :compiler-args ${ssToSExp(c.compilerArgs)}
- :formatting-prefs (${toSExp(c.formatting)})
+ ${toSExp(c.formatting)}
  :subprojects ${msToSExp(c.modules.values)}
  ${c.raw}
 )"""

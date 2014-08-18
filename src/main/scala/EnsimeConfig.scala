@@ -11,7 +11,7 @@ case class EnsimeConfig(
   javaHome: Option[File],
   javaFlags: List[String],
   javaSrc: Option[File],
-  formatting: IFormattingPreferences,
+  formatting: Option[IFormattingPreferences],
   raw: String
 )
 

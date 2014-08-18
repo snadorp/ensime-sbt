@@ -80,7 +80,7 @@ object EnsimePlugin extends Plugin with CommandSupport {
       getInputArguments.asScala.toList
     val raw = (EnsimeKeys.additionalSExp in Compile).run
 
-    val formatting = (ScalariformKeys.preferences in Compile).gimme
+    val formatting = (ScalariformKeys.preferences in Compile).gimmeOpt
 
     val config = EnsimeConfig(
       root, cacheDir, name, scalaV, compilerArgs,
