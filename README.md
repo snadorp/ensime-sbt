@@ -13,15 +13,33 @@ request ideas.
 ## Installation
 
 ENSIME is effectively using a rolling release strategy until version
-1.0. Therefore, the latest plugin is available by adding the following
-to your `project/plugins.sbt`:
+1.0. The latest plugin is available by adding the following
+to your `~/.sbt/0.13/plugins/plugins.sbt`:
 
 
 ```scala
-    resolvers += Resolver.sonatypeRepo("snapshots")
+resolvers += Resolver.sonatypeRepo("snapshots")
 
-    addSbtPlugin("org.ensime" % "ensime-sbt" % "0.1.5-SNAPSHOT")
+addSbtPlugin("org.ensime" % "ensime-sbt" % "0.1.5-SNAPSHOT")
 ```
+
+We recommend installing the plugin in `~/.sbt` as opposed to
+`project/plugins.sbt` because the decision to use ENSIME is per-user,
+rather than per-project.
+
+If you want to customise the output, create a file `project/ensime.sbt`
+which is ignored by SCM (or use `~/.sbt/0.13/ensime.sbt`), and customise
+like so:
+
+```
+import EnsimePlugin._
+import EnsimeKeys._
+
+(compilerArgs in Compile) := (scalacOptions in Compile).value ++ Seq("-Ywarn-dead-code", "-Ywarn-shadowing")
+
+(additionalSExp in Compile) := ":custom-key custom-value"
+```
+
 
 Only sbt 0.13.x is supported.
 
@@ -31,15 +49,13 @@ recommend it.
 
 ## Using
 
-Type `sbt 'ensime generate -s'` or, from the sbt prompt:
+Type `sbt gen-ensime` or, from the sbt prompt:
 
 ```
-ensime generate -s
+gen-ensime
 ```
 
-leave off the `-s` if you don't want source jars to be downloaded and
-referenced in the resulting `.ensime` file.
-
+Downloading and resolving the sources and javadocs can take some time on first use.
 
 ## Developers / Workarounds
 
