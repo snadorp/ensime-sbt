@@ -44,8 +44,8 @@ object SExpFormatter {
 
   // a lot of legacy key names and conventions
   def toSExp(c: EnsimeConfig): String = s"""(
- :root ${toSExp(c.root)}
- :cacheDir ${toSExp(c.cacheDir)}
+ :root-dir ${toSExp(c.root)}
+ :cache-dir ${toSExp(c.cacheDir)}
  :name "${c.name}"
  ${fToSExp("java-home", c.javaHome)}
  :java-flags ${ssToSExp(c.javaFlags)}

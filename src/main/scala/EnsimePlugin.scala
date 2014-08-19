@@ -5,6 +5,7 @@ import complete.Parsers._
 import collection.immutable.SortedMap
 import collection.JavaConverters._
 import java.lang.management.ManagementFactory
+import scala.util.Properties
 import SExpFormatter._
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import scalariform.formatter.preferences.IFormattingPreferences
@@ -59,7 +60,7 @@ object EnsimePlugin extends Plugin with CommandSupport {
       )
     }
 
-    val root = file(".")
+    val root = file(Properties.userDir)
     val out = file(".ensime")
     val cacheDir = file(".ensime_cache")
     val name = EnsimeKeys.name.gimmeOpt.getOrElse {
