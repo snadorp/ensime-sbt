@@ -34,11 +34,15 @@ licenses := Seq("BSD 3 Clause" -> url("http://opensource.org/licenses/BSD-3-Clau
 
 homepage := Some(url("http://github.com/ensime/ensime-server"))
 
-publishTo <<= version { v: String =>
+publishTo := {
   val nexus = "https://oss.sonatype.org/"
-  if (v.contains("SNAP")) Some("snapshots" at nexus + "content/repositories/snapshots")
-  else                    Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+  if (isSnapshot.value)
+    Some("snapshots" at nexus + "content/repositories/snapshots")
+  else
+    Some("releases"  at nexus + "service/local/staging/deploy/maven2")
 }
+
+publishMavenStyle := false
 
 credentials += Credentials(
   "Sonatype Nexus Repository Manager", "oss.sonatype.org",

@@ -1,3 +1,5 @@
+package org.ensime
+
 import sbt._
 import scalariform.formatter.preferences._
 
