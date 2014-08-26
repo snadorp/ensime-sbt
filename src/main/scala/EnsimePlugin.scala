@@ -65,7 +65,7 @@ object EnsimePlugin extends Plugin with CommandSupport {
     val cacheDir = file(".ensime_cache")
     val name = EnsimeKeys.name.gimmeOpt.getOrElse {
       if (modules.size == 1) modules.head._2.name
-      else root.getAbsoluteFile.getParentFile.getName
+      else root.getAbsoluteFile.getName
     }
     val compilerArgs = (EnsimeKeys.compilerArgs in Compile).run.toList
     val scalaV = (scalaVersion in Compile).gimme
