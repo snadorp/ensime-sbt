@@ -1,8 +1,10 @@
+package org.ensime
+
 import sbt._
 import IO._
 
 trait CommandSupport {
-  this: Plugin =>
+  this: AutoPlugin =>
 
   protected def fail(errorMessage: String)(implicit state: State): Nothing = {
     state.log.error(errorMessage)
