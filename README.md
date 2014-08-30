@@ -35,17 +35,8 @@ import org.ensime.Imports._
 EnsimeKeys.compilerArgs in Compile := (scalacOptions in Compile).value ++ Seq("-Ywarn-dead-code", "-Ywarn-shadowing")
 
 // custom settings (this is an example of adding scalariform formatting preferences):
-EnsimeKeys.additionalSExp in Compile := """
-:formatting-prefs (
-  :alignSingleLineCaseStatements nil
-  :multilineScaladocCommentsStartOnFirstLine t
-  :placeScaladocAsterisksBeneathSecondAsterisk t
-)
-"""
+EnsimeKeys.additionalSExp in Compile := (additionalSExp in Compile) := ":custom-key custom-value"
 ```
-
-An older 0.1.1 release is available for sbt 0.12, but we don't
-recommend it.
 
 ## Usage
 
