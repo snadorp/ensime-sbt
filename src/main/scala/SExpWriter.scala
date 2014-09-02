@@ -68,7 +68,7 @@ object SExpFormatter {
    :test-target ${toSExp(m.testTarget)}
    :depends-on-modules ${ssToSExp(m.dependsOnNames)}
    :compile-deps ${fsToSExp(m.compileJars)}
-   :runtime-deps ${fsToSExp(m.runtimeJars)}
+   :runtime-deps ${fsToSExp(m.runtimeJars ++ m.compileJars)}
    :test-deps ${fsToSExp(m.testJars)}
    :reference-source-roots ${fsToSExp(m.sourceJars)})"""
 }

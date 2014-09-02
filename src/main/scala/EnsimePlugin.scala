@@ -119,7 +119,7 @@ object EnsimePlugin extends AutoPlugin with CommandSupport {
     implicit projectRef: ProjectRef,
     buildStruct: BuildStructure,
     state: State): EnsimeModule = {
-    log.info(s"ENSIME processing ${project.id}")
+    log.info(s"ENSIME processing ${project.id} (${name.gimme})")
 
     def sourcesFor(config: Configuration) = {
       // invoke source generation so we can filter on existing directories
@@ -160,7 +160,7 @@ object EnsimePlugin extends AutoPlugin with CommandSupport {
     val jarDocs = jarDocsFor(Test)
 
     EnsimeModule(
-      project.id, mainSources, testSources, mainTarget, testTarget, deps,
+      name.gimme, mainSources, testSources, mainTarget, testTarget, deps,
       mainJars, runtimeJars, testJars, jarSrcs, jarDocs)
   }
 }
