@@ -38,6 +38,9 @@ EnsimeKeys.compilerArgs in Compile := (scalacOptions in Compile).value ++ Seq("-
 EnsimeKeys.additionalSExp in Compile := (additionalSExp in Compile) := ":custom-key custom-value"
 ```
 
+**BUG IN SBT**: see https://github.com/sbt/sbt/issues/1592 if you get any problems about `error: value enablePlugins is not a member of sbt.Project`.
+
+
 ## Usage
 
 Type `sbt gen-ensime` or, from the sbt prompt:
