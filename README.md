@@ -25,6 +25,10 @@ We recommend installing the plugin in `~/.sbt` as opposed to
 `project/plugins.sbt` because the decision to use ENSIME is per-user,
 rather than per-project.
 
+
+**BUG IN SBT: see https://github.com/sbt/sbt/issues/1592 if you get any problems about `error: value enablePlugins is not a member of sbt.Project`.**
+
+
 If you want to customise the output, create a file `project/ensime.sbt`
 which is ignored by SCM (or use `~/.sbt/0.13/ensime.sbt`), and customise
 like so:
@@ -37,8 +41,6 @@ EnsimeKeys.compilerArgs in Compile := (scalacOptions in Compile).value ++ Seq("-
 // custom settings (this is an example of adding scalariform formatting preferences):
 EnsimeKeys.additionalSExp in Compile := (additionalSExp in Compile) := ":custom-key custom-value"
 ```
-
-**BUG IN SBT**: see https://github.com/sbt/sbt/issues/1592 if you get any problems about `error: value enablePlugins is not a member of sbt.Project`.
 
 
 ## Usage
