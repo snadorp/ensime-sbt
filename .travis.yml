@@ -4,7 +4,7 @@ jdk:
 scala:
 - 2.10.4
 after_success:
-- sbt publish
+- sbt ++$TRAVIS_SCALA_VERSION clean $(if [[ "$TRAVIS_PULL_REQUEST" == "false" && "$JAVA_HOME" == "$(jdk_switcher home openjdk6)" ]]; then echo "publish"; fi)
 env:
   global:
     # travis encrypt -r ensime/ensime-sbt SONATYPE_USERNAME=<USERNAME>
