@@ -22,7 +22,7 @@ case class EnsimeModule(
     mainRoots: Set[File],
     testRoots: Set[File],
     target: File,
-    testTarget: File,
+    testTargets: Set[File],
     dependsOnNames: Set[String],
     compileJars: Set[File],
     runtimeJars: Set[File],
