@@ -1,7 +1,6 @@
-package org.ensime
-
 import sbt._
 import scalariform.formatter.preferences.IFormattingPreferences
+import java.io.File
 
 case class EnsimeConfig(
   root: File,

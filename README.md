@@ -7,13 +7,14 @@ contributors. This is a fairly small and easy to understand plugin, so
 please consider sending us a Pull Request if you have any feature
 request ideas.
 
+ensime-sbt supports sbt 0.12 and 0.13. Below are installation instructions for 0.12.
+For sbt 0.13, see the master branch: https://github.com/ensime/ensime-sbt/tree/master
+
 ## Installation
 
 ENSIME is effectively using a rolling release strategy until version
 1.0. The latest plugin is available by adding the following
-to your `~/.sbt/0.13/plugins/plugins.sbt`:
-
-Ensime is now an [AutoPlugin](http://www.scala-sbt.org/release/docs/Plugins.html#Creating+an+auto+plugin), which requires SBT 0.13.5+.
+to your `~/.sbt/plugins/plugins.sbt`:
 
 ```scala
 resolvers += Resolver.sonatypeRepo("snapshots")
@@ -25,23 +26,23 @@ We recommend installing the plugin in `~/.sbt` as opposed to
 `project/plugins.sbt` because the decision to use ENSIME is per-user,
 rather than per-project.
 
-
-**BUG IN SBT: see https://github.com/sbt/sbt/issues/1592 if you get any problems about `error: value enablePlugins is not a member of sbt.Project`.**
-
-
 If you want to customise the output, create a file `project/ensime.sbt`
-which is ignored by SCM (or use `~/.sbt/0.13/ensime.sbt`), and customise
+which is ignored by SCM (or use `~/.sbt/ensime.sbt`), and customise
 like so:
 
 ```scala
-import org.ensime.Imports._
+import EnsimePlugin._
+import EnsimeKeys._
 
-EnsimeKeys.compilerArgs in Compile := (scalacOptions in Compile).value ++ Seq("-Ywarn-dead-code", "-Ywarn-shadowing")
+// Set global :name property
+projectName := "my-project"
 
-// custom settings (this is an example of adding scalariform formatting preferences):
+// Customize the :compiler-args property
+compilerArgs in Compile <<= (scalacOptions in Compile) map { (o) => o ++ Seq("-Ywarn-dead-code", "-Ywarn-shadowing") }
+
+// add arbitrary keys/values
 EnsimeKeys.additionalSExp in Compile := (additionalSExp in Compile) := ":custom-key custom-value"
 ```
-
 
 ## Usage
 
