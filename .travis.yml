@@ -1,3 +1,7 @@
+branches:
+ only:
+  - master
+  - sbt-0.12
 language: scala
 jdk:
 - openjdk6
