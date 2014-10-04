@@ -17,8 +17,6 @@ scalacOptions in Compile ++= Seq(
 // TODO: when ENSIME itself is ready for a reformat, depend on the recent scalariform
 addSbtPlugin("com.typesafe.sbt" %% "sbt-scalariform" % "1.0.1")
 
-publishMavenStyle := true
-
 licenses := Seq("BSD 3 Clause" -> url("http://opensource.org/licenses/BSD-3-Clause"))
 
 homepage := Some(url("http://github.com/ensime/ensime-server"))
@@ -31,7 +29,7 @@ publishTo <<= version { (v: String) =>
     Some("releases"  at nexus + "service/local/staging/deploy/maven2")
 }
 
-publishMavenStyle := false
+publishMavenStyle := true
 
 credentials += Credentials(
   "Sonatype Nexus Repository Manager", "oss.sonatype.org",
