@@ -1,59 +1,30 @@
-package org.ensime
-
 import sbt._
+import sbt.Load.BuildStructure
 import Keys._
 import IO._
-import complete.Parsers._
-import collection.immutable.SortedMap
 import collection.JavaConverters._
 import java.lang.management.ManagementFactory
 import scala.util.Properties
 import SExpFormatter._
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
-import scalariform.formatter.preferences.IFormattingPreferences
 
-/** Conventional way to define importable keys for an AutoPlugin.
-  * Note that EnsimePlugin.autoImport == Imports
-  */
-object Imports {
-  object EnsimeKeys {
-    val name = SettingKey[String]("name of the ENSIME project")
-    val compilerArgs = TaskKey[Seq[String]]("arguments for the presentation compiler")
-    val additionalSExp = TaskKey[String]("raw SExp to include in the output")
-  }
-}
-
-object EnsimePlugin extends AutoPlugin with CommandSupport {
-
-  val autoImport = Imports
-
-  // Ensures the underlying base SBT plugin settings are loaded prior to Ensime.
-  // This is important otherwise the `compilerArgs` would not be able to
-  // depend on `scalacOptions in Compile` (becuase they wouldn't be set yet)
-  override def requires = plugins.JvmPlugin
-
-  // Automatically enable the plugin so the user doesn't have to `enablePlugins`
-  // in their projects' build.sbt
-  override def trigger = allRequirements
-
-  import autoImport._
+object EnsimePlugin extends Plugin with CommandSupport {
 
   lazy val ensimeCommand = Command.command("gen-ensime")(genEnsime)
-
-  override lazy val projectSettings = Seq(
+  override lazy val settings = Seq(
     commands += ensimeCommand,
-    EnsimeKeys.compilerArgs := (scalacOptions in Compile).value,
+    EnsimeKeys.compilerArgs  <<= (scalacOptions in Compile),
     EnsimeKeys.additionalSExp := ""
   )
 
+  object EnsimeKeys {
+    val projectName = SettingKey[String]("project-name", "name of the ENSIME project")
+    val compilerArgs = TaskKey[Seq[String]]("compiler-args", "arguments for the presentation compiler")
+    val additionalSExp = TaskKey[String]("additional-sexp", "raw SExp to include in the output")
+  }
+
   def genEnsime(state: State): State = {
     implicit val s = state
-    val provider = state.configuration.provider
-
-    // val sbtScalaVersion = provider.scalaProvider.version
-    // val sbtInstance = ScalaInstance(sbtScalaVersion, provider.scalaProvider.launcher)
-    // val sbtProject = BuildPaths.projectStandard(state.baseDir)
-    // val sbtOut = BuildPaths.crossPath(BuildPaths.outputDirectory(sbtProject), sbtInstance)
 
     val extracted = Project.extract(state)
     implicit val pr = extracted.currentRef
@@ -84,10 +55,8 @@ object EnsimePlugin extends AutoPlugin with CommandSupport {
     val root = file(Properties.userDir)
     val out = file(".ensime")
     val cacheDir = file(".ensime_cache")
-    val name = EnsimeKeys.name.gimmeOpt.getOrElse {
-      if (modules.size == 1) modules.head._2.name
-      else root.getAbsoluteFile.getName
-    }
+    val projectName = EnsimeKeys.projectName.gimmeOpt.getOrElse(name.gimme)
+
     val compilerArgs = (EnsimeKeys.compilerArgs in Compile).run.toList
     val scalaV = (scalaVersion in Compile).gimme
     val javaH = (javaHome in Compile).gimme.
@@ -105,7 +74,7 @@ object EnsimePlugin extends AutoPlugin with CommandSupport {
     val formatting = (ScalariformKeys.preferences in Compile).gimmeOpt
 
     val config = EnsimeConfig(
-      root, cacheDir, name, scalaV, compilerArgs,
+      root, cacheDir, projectName, scalaV, compilerArgs,
       modules, javaH, javaFlags, javaSrc, formatting, raw
     )
 
@@ -119,7 +88,7 @@ object EnsimePlugin extends AutoPlugin with CommandSupport {
     implicit projectRef: ProjectRef,
     buildStruct: BuildStructure,
     state: State): EnsimeModule = {
-    log.info(s"ENSIME processing ${project.id} (${name.gimme})")
+    log.info("ENSIME processing " + project.id + " (" + name.gimme + ")")
 
     def sourcesFor(config: Configuration) = {
       // invoke source generation so we can filter on existing directories

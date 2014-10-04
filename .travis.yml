@@ -2,7 +2,7 @@ language: scala
 jdk:
 - openjdk6
 scala:
-- 2.10.4
+- 2.9.2
 after_success:
 - sbt ++$TRAVIS_SCALA_VERSION clean $(if [[ "$TRAVIS_PULL_REQUEST" == "false" && "$JAVA_HOME" == "$(jdk_switcher home openjdk6)" ]]; then echo "publish"; fi)
 env:
