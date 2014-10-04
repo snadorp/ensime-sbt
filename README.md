@@ -13,7 +13,7 @@ ENSIME is effectively using a rolling release strategy until version
 1.0. The latest plugin is available by adding the following
 to your `~/.sbt/0.13/plugins/plugins.sbt`:
 
-Ensime is now an [AutoPlugin](http://www.scala-sbt.org/release/docs/Plugins.html#Creating+an+auto+plugin), which requires SBT 0.13.5+.
+Ensime is now an [AutoPlugin](http://www.scala-sbt.org/release/docs/Plugins.html#Creating+an+auto+plugin), which requires SBT 0.13.5+. A backport exists only for sbt 0.12.x.
 
 ```scala
 resolvers += Resolver.sonatypeRepo("snapshots")
@@ -42,6 +42,15 @@ EnsimeKeys.compilerArgs in Compile := (scalacOptions in Compile).value ++ Seq("-
 EnsimeKeys.additionalSExp in Compile := (additionalSExp in Compile) := ":custom-key custom-value"
 ```
 
+For the 0.12.x branch, these files must go into the relevant `~/.sbt/0.12.x` and the `ensime.sbt` must start with
+
+```scala
+import EnsimePlugin._
+import EnsimeKeys._
+```
+
+instead of `import org.ensime.Imports._`
+
 
 ## Usage
 
@@ -61,3 +70,5 @@ then:
 ```bash
 > sbt publishLocal
 ```
+
+(`sbt publish-local` for the 0.12 branch)
