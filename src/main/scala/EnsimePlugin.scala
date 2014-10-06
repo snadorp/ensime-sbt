@@ -90,13 +90,10 @@ object EnsimePlugin extends AutoPlugin with CommandSupport {
     }
     val compilerArgs = (EnsimeKeys.compilerArgs in Compile).run.toList
     val scalaV = (scalaVersion in Compile).gimme
-    val javaH = (javaHome in Compile).gimme.
-      orElse(sys.env.get("JAVA_HOME").map(file))
-    val javaSrc = javaH.flatMap { h =>
-      file(h + "/src.zip") match {
-        case f if f.exists => Some(f)
-        case _ => None
-      }
+    val javaH = (javaHome in Compile).gimme.getOrElse(file(Properties.jdkHome))
+    val javaSrc = file(javaH.getAbsolutePath + "/src.zip") match {
+      case f if f.exists => Some(f)
+      case _ => None
     }
     val javaFlags = ManagementFactory.getRuntimeMXBean.
       getInputArguments.asScala.toList

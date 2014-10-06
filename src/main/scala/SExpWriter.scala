@@ -49,7 +49,7 @@ object SExpFormatter {
  :root-dir ${toSExp(c.root)}
  :cache-dir ${toSExp(c.cacheDir)}
  :name "${c.name}"
- ${fToSExp("java-home", c.javaHome)}
+ :java-home ${toSExp(c.javaHome)}
  :java-flags ${ssToSExp(c.javaFlags)}
  :reference-source-roots ${fsToSExp(c.javaSrc.toIterable)}
  :scala-version ${toSExp(c.scalaVersion)}

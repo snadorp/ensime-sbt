@@ -10,7 +10,7 @@ case class EnsimeConfig(
   scalaVersion: String,
   compilerArgs: List[String],
   modules: Map[String, EnsimeModule],
-  javaHome: Option[File],
+  javaHome: File,
   javaFlags: List[String],
   javaSrc: Option[File],
   formatting: Option[IFormattingPreferences],
