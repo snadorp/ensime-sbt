@@ -49,7 +49,7 @@ object SExpFormatter {
  :root-dir ${toSExp(c.root)}
  :cache-dir ${toSExp(c.cacheDir)}
  :name "${c.name}"
- ${fToSExp("java-home", c.javaHome)}
+ :java-home ${toSExp(c.javaHome)}
  :java-flags ${ssToSExp(c.javaFlags)}
  :reference-source-roots ${fsToSExp(c.javaSrc.toIterable)}
  :scala-version ${toSExp(c.scalaVersion)}
@@ -68,7 +68,7 @@ object SExpFormatter {
    :test-target ${toSExp(m.testTarget)}
    :depends-on-modules ${ssToSExp(m.dependsOnNames)}
    :compile-deps ${fsToSExp(m.compileJars)}
-   :runtime-deps ${fsToSExp(m.runtimeJars ++ m.compileJars)}
+   :runtime-deps ${fsToSExp(m.runtimeJars)}
    :test-deps ${fsToSExp(m.testJars)}
    :reference-source-roots ${fsToSExp(m.sourceJars)})"""
 }
