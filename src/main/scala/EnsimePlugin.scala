@@ -136,6 +136,8 @@ object EnsimePlugin extends AutoPlugin with CommandSupport {
       configuration = configurationFilter(filter | config.name.toLowerCase),
       artifact = artifactFilter(extension = "jar")
     ).toSet
+    def unmanagedJarsFor(config: Configuration) =
+      (unmanagedJars in config).run.map(_.data).toSet
     def jarSrcsFor(config: Configuration) = updateClassifiersReport.select(
       configuration = configurationFilter(filter | config.name.toLowerCase),
       artifact = artifactFilter(classifier = "sources")
@@ -150,9 +152,9 @@ object EnsimePlugin extends AutoPlugin with CommandSupport {
     val mainTarget = targetFor(Compile)
     val testTarget = targetFor(Test)
     val deps = project.dependencies.map(_.project.project).toSet
-    val mainJars = jarsFor(Compile)
-    val runtimeJars = jarsFor(Runtime) -- mainJars
-    val testJars = jarsFor(Test) -- mainJars
+    val mainJars = jarsFor(Compile) ++ unmanagedJarsFor(Compile)
+    val runtimeJars = jarsFor(Runtime) ++ unmanagedJarsFor(Runtime) -- mainJars
+    val testJars = jarsFor(Test) ++ unmanagedJarsFor(Test) -- mainJars
     val jarSrcs = jarSrcsFor(Test)
     val jarDocs = jarDocsFor(Test)
 
