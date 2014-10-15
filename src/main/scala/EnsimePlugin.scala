@@ -120,46 +120,60 @@ object EnsimePlugin extends AutoPlugin with CommandSupport {
 
     def sourcesFor(config: Configuration) = {
       // invoke source generation so we can filter on existing directories
-      (managedSources in config).run
-      (managedSourceDirectories in config).gimme.filter(_.exists).toSet ++
-        (unmanagedSourceDirectories in config).gimme
+      (managedSources in config).runOpt
+      (managedSourceDirectories in config).gimmeOpt.map(_.filter(_.exists).toSet).getOrElse(Set()) ++
+        (unmanagedSourceDirectories in config).gimmeOpt.getOrElse(Set())
     }
+
     def targetFor(config: Configuration) =
       (classDirectory in config).gimme
 
+    def targetForOpt(config: Configuration) =
+      (classDirectory in config).gimmeOpt
+
     // run these once for performance
-    val updateReport = (update in Test).run
-    val updateClassifiersReport = (updateClassifiers in Test).run
+    val updateReports = List(
+      (update in Test).runOpt,
+      (update in IntegrationTest).runOpt).flatten
+
+    val updateClassifiersReports = List(
+      (updateClassifiers in Test).runOpt,
+      (updateClassifiers in IntegrationTest).runOpt).flatten
+
     val filter = if (sbtPlugin.gimme) "provided" else ""
 
-    def jarsFor(config: Configuration) = updateReport.select(
+    def jarsFor(config: Configuration) = updateReports.flatMap(_.select(
       configuration = configurationFilter(filter | config.name.toLowerCase),
       artifact = artifactFilter(extension = "jar")
-    ).toSet
+    )).toSet
+
     def unmanagedJarsFor(config: Configuration) =
-      (unmanagedJars in config).run.map(_.data).toSet
-    def jarSrcsFor(config: Configuration) = updateClassifiersReport.select(
+      (unmanagedJars in config).runOpt.map(_.map(_.data).toSet).getOrElse(Set())
+
+    def jarSrcsFor(config: Configuration) = updateClassifiersReports.flatMap(_.select(
       configuration = configurationFilter(filter | config.name.toLowerCase),
       artifact = artifactFilter(classifier = "sources")
-    ).toSet
-    def jarDocsFor(config: Configuration) = updateClassifiersReport.select(
+    )).toSet
+
+    def jarDocsFor(config: Configuration) = updateClassifiersReports.flatMap(_.select(
       configuration = configurationFilter(filter | config.name.toLowerCase),
       artifact = artifactFilter(classifier = "javadoc")
-    ).toSet
+    )).toSet
 
     val mainSources = sourcesFor(Compile)
-    val testSources = sourcesFor(Test)
+    val testSources = sourcesFor(Test) ++ sourcesFor(IntegrationTest)
     val mainTarget = targetFor(Compile)
-    val testTarget = targetFor(Test)
+    val testTargets = (targetForOpt(Test) ++ targetForOpt(IntegrationTest)).toSet
     val deps = project.dependencies.map(_.project.project).toSet
     val mainJars = jarsFor(Compile) ++ unmanagedJarsFor(Compile)
     val runtimeJars = jarsFor(Runtime) ++ unmanagedJarsFor(Runtime) -- mainJars
-    val testJars = jarsFor(Test) ++ unmanagedJarsFor(Test) -- mainJars
-    val jarSrcs = jarSrcsFor(Test)
-    val jarDocs = jarDocsFor(Test)
+    val testJars = jarsFor(Test) ++ jarsFor(IntegrationTest) ++
+      unmanagedJarsFor(Test) ++ unmanagedJarsFor(IntegrationTest) -- mainJars
+    val jarSrcs = jarSrcsFor(Test) ++ jarSrcsFor(IntegrationTest)
+    val jarDocs = jarDocsFor(Test) ++ jarDocsFor(IntegrationTest)
 
     EnsimeModule(
-      project.id, mainSources, testSources, mainTarget, testTarget, deps,
+      project.id, mainSources, testSources, mainTarget, testTargets, deps,
       mainJars, runtimeJars, testJars, jarSrcs, jarDocs)
   }
 }
