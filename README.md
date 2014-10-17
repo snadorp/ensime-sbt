@@ -45,7 +45,8 @@ EnsimeKeys.compilerArgs in Compile := (scalacOptions in Compile).value ++ Seq("-
 EnsimeKeys.additionalSExp in Compile := (additionalSExp in Compile) := ":custom-key custom-value"
 ```
 
-For the 0.12.x branch, these files must go into the relevant `~/.sbt/0.12.x` and the `ensime.sbt` must start with
+For the 0.12.x branch, these files must go into `~/.sbt`
+(that is `~/.sbt/plugins/plugins.sbt`, `~/.sbt/ensime.sbt`) and the `ensime.sbt` must start with
 
 ```scala
 import EnsimePlugin._
