@@ -7,7 +7,8 @@ import complete.Parsers._
 import collection.immutable.SortedMap
 import collection.JavaConverters._
 import java.lang.management.ManagementFactory
-import scala.util.Properties
+import scala.util._
+import java.io.FileNotFoundException
 import SExpFormatter._
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import scalariform.formatter.preferences.IFormattingPreferences
@@ -90,10 +91,12 @@ object EnsimePlugin extends AutoPlugin with CommandSupport {
     }
     val compilerArgs = (EnsimeKeys.compilerArgs in Compile).run.toList
     val scalaV = (scalaVersion in Compile).gimme
-    val javaH = (javaHome in Compile).gimme.getOrElse(file(Properties.jdkHome))
+    val javaH = (javaHome in Compile).gimme.getOrElse(JdkDir)
     val javaSrc = file(javaH.getAbsolutePath + "/src.zip") match {
       case f if f.exists => Some(f)
-      case _ => None
+      case _ =>
+        log.warn(s"No Java sources detected in $javaH (your ENSIME experience will not be as good as it could be.)")
+        None
     }
     val javaFlags = ManagementFactory.getRuntimeMXBean.
       getInputArguments.asScala.toList
@@ -176,4 +179,23 @@ object EnsimePlugin extends AutoPlugin with CommandSupport {
       project.id, mainSources, testSources, mainTarget, testTargets, deps,
       mainJars, runtimeJars, testJars, jarSrcs, jarDocs)
   }
+
+  // WORKAROUND: https://github.com/typelevel/scala/issues/75
+  lazy val JdkDir: File = List(
+    // manual
+    sys.env.get("JDK_HOME"),
+    sys.env.get("JAVA_HOME"),
+    // osx
+    Try("/usr/libexec/java_home".!!.trim).toOption,
+    // fallback
+    sys.props.get("java.home").map(new File(_).getParent),
+    sys.props.get("java.home")
+  ).flatten.filter { n =>
+    new File(n + "/lib/tools.jar").exists
+  }.headOption.map(new File(_)).getOrElse(
+    throw new FileNotFoundException(
+      """Could not automatically find the JDK/lib/tools.jar.
+      |You must explicitly set JDK_HOME or JAVA_HOME.""".stripMargin
+    )
+  )
 }
