@@ -60,7 +60,7 @@ object EnsimePlugin extends AutoPlugin with CommandSupport {
     implicit val pr = extracted.currentRef
     implicit val bs = extracted.structure
 
-    val projects = bs.allProjectRefs(bs.root).flatMap { ref =>
+    val projects = bs.allProjectRefs.flatMap { ref =>
       Project.getProjectForReference(ref, bs).map((ref, _))
     }.toMap
 
