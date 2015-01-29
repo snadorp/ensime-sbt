@@ -70,5 +70,6 @@ object SExpFormatter {
    :compile-deps ${fsToSExp(m.compileJars)}
    :runtime-deps ${fsToSExp(m.runtimeJars)}
    :test-deps ${fsToSExp(m.testJars)}
+   :doc-jars ${fsToSExp(m.docJars)}
    :reference-source-roots ${fsToSExp(m.sourceJars)})"""
 }
