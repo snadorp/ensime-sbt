@@ -143,6 +143,8 @@ object EnsimePlugin extends AutoPlugin with CommandSupport {
       (updateClassifiers in Test).runOpt,
       (updateClassifiers in IntegrationTest).runOpt).flatten
 
+    val myDoc = (artifactPath in (Compile, packageDoc)).gimmeOpt
+
     val filter = if (sbtPlugin.gimme) "provided" else ""
 
     def jarsFor(config: Configuration) = updateReports.flatMap(_.select(
@@ -173,7 +175,7 @@ object EnsimePlugin extends AutoPlugin with CommandSupport {
     val testJars = jarsFor(Test) ++ jarsFor(IntegrationTest) ++
       unmanagedJarsFor(Test) ++ unmanagedJarsFor(IntegrationTest) -- mainJars
     val jarSrcs = jarSrcsFor(Test) ++ jarSrcsFor(IntegrationTest)
-    val jarDocs = jarDocsFor(Test) ++ jarDocsFor(IntegrationTest)
+    val jarDocs = jarDocsFor(Test) ++ jarDocsFor(IntegrationTest) ++ myDoc
 
     EnsimeModule(
       project.id, mainSources, testSources, mainTarget, testTargets, deps,
