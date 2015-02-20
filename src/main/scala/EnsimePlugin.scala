@@ -145,10 +145,11 @@ object EnsimePlugin extends AutoPlugin with CommandSupport {
 
     val myDoc = (artifactPath in (Compile, packageDoc)).gimmeOpt
 
-    val filter = if (sbtPlugin.gimme) "provided" else ""
+    //val filter = if (sbtPlugin.gimme) "provided" else ""
 
     def jarsFor(config: Configuration) = updateReports.flatMap(_.select(
-      configuration = configurationFilter(filter | config.name.toLowerCase),
+      //configuration = configurationFilter(filter | config.name.toLowerCase),
+      configuration = configurationFilter(config.name.toLowerCase),
       artifact = artifactFilter(extension = "jar")
     )).toSet
 
@@ -156,12 +157,14 @@ object EnsimePlugin extends AutoPlugin with CommandSupport {
       (unmanagedJars in config).runOpt.map(_.map(_.data).toSet).getOrElse(Set())
 
     def jarSrcsFor(config: Configuration) = updateClassifiersReports.flatMap(_.select(
-      configuration = configurationFilter(filter | config.name.toLowerCase),
+      //configuration = configurationFilter(filter | config.name.toLowerCase),
+      configuration = configurationFilter(config.name.toLowerCase),
       artifact = artifactFilter(classifier = "sources")
     )).toSet
 
     def jarDocsFor(config: Configuration) = updateClassifiersReports.flatMap(_.select(
-      configuration = configurationFilter(filter | config.name.toLowerCase),
+            //configuration = configurationFilter(filter | config.name.toLowerCase),
+      configuration = configurationFilter(config.name.toLowerCase),
       artifact = artifactFilter(classifier = "javadoc")
     )).toSet
 
